@@ -98,10 +98,29 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
     }
 
     async afterResponse(botMessage: Message): Promise<Partial<StageResponse<ChatStateType, MessageStateType>>> {
+
+        const {content} = botMessage;
+        let newContent = content;
+
+        const longTermRegex = /\[\[([^\]]+)\]\](?!\()/gm;
+        const possibleLongTermInstruction = [...newContent.matchAll(longTermRegex)].map(match => match.slice(1)).join('\n').trim();
+        if (possibleLongTermInstruction.length > 0) {
+            if (this.longTermLife > 0) {
+                console.log(`Response is replacing long-term instruction:\n${this.longTermInstruction}\nWith:\n${possibleLongTermInstruction}`);
+            } else {
+                console.log(`Response is setting long-term instruction:\n${possibleLongTermInstruction}`);
+            }
+            this.longTermInstruction = possibleLongTermInstruction;
+            this.longTermLife = this.maxLife;
+            newContent = newContent.replace(longTermRegex, "").trim();
+        }
+
+        let messageState = this.writeMessageState();
+
         return {
             stageDirections: null,
-            messageState: this.writeMessageState(),
-            modifiedMessage: null,
+            messageState: messageState,
+            modifiedMessage: newContent,
             error: null,
             systemMessage: null,
             chatState: null
