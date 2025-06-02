@@ -12,7 +12,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
     // Configurable:
     maxLife: number = 10;
 
-    // Per message state:
+    // Per-message state:
     longTermInstruction: string = '';
     longTermLife: number = 0;
 
@@ -59,7 +59,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         this.longTermLife = Math.max(0, this.longTermLife - 1);
 
-        const longTermRegex = /\[\[([^\]]+)\]\](?!\()/gm;
+        const longTermRegex = /\[\[([^\]]*)\]\](?!\()/gm;
         const possibleLongTermInstruction = [...newContent.matchAll(longTermRegex)].map(match => match.slice(1)).join('\n').trim();
         if (possibleLongTermInstruction.length > 0) {
             if (this.longTermLife > 0) {
@@ -72,13 +72,13 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             newContent = newContent.replace(longTermRegex, "").trim();
         }
 
-        const currentRegex = /\[([^\]]+)\](?!\()/gm;
+        const currentRegex = /\[([^\]]*)\](?!\()/gm;
         const currentInstruction = [...newContent.matchAll(currentRegex)].map(match => match.slice(1)).join('\n').trim();
         newContent = newContent.replace(currentRegex, "").trim();
 
         const stageDirections = 
-                ((this.longTermInstruction.length > 0 && this.longTermLife > 0) ? `### Ongoing Instruction: ${this.longTermInstruction}\n` : '') +
-                (currentInstruction.length > 0 ? `### Critical Instruction: ${currentInstruction}\n` : '');
+                ((this.longTermInstruction.length > 0 && this.longTermLife > 0) ? `Ongoing Instruction: ${this.longTermInstruction}\n` : '') +
+                (currentInstruction.length > 0 ? `Critical Instruction: ${currentInstruction}\n` : '');
 
         // Preserve empty responses that only had instruction.
         if (newContent !== content && newContent.length == 0) {
@@ -86,6 +86,10 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         }
 
         let messageState = this.writeMessageState();
+
+        if (stageDirections.length > 0) {
+            console.log(`Sending stage directions:\n${stageDirections}`);
+        }
 
         return {
             stageDirections: stageDirections.length > 0 ? stageDirections : null,
