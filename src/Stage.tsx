@@ -28,7 +28,6 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         const {
             characters,
             users,
-            initState,
         } = data;
 
         this.characters = characters;
@@ -158,6 +157,11 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         console.log(`anonymizedId: ${anonymizedId}, promptForId: ${promptForId}`);
         let newContent = content;
 
+        // Strip out markdown that it has attempted to mimic.
+        newContent = newContent.replace(/!\[.*?\]\(.*?\)/g, '');
+        newContent = newContent.replace(/\[.*?\]\(.*?\)/g, '');
+
+        /*
         const longTermRegex = /\[\[([^\]]+)\]\](?!\()/gm;
         const possibleLongTermInstruction = [...newContent.matchAll(longTermRegex)].map(match => match.slice(1)).join('\n').trim();
         if (possibleLongTermInstruction.length > 0) {
@@ -169,7 +173,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             this.longTermInstruction = possibleLongTermInstruction;
             this.longTermLife = this.maxLife;
             newContent = newContent.replace(longTermRegex, "").trim();
-        }
+        }*/
 
         let imageUrls = [];
         for (let instruction of this.imageInstructions) {
@@ -185,13 +189,15 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                 include_history: true
             });
             if (imageDescription?.result) {
-                console.log(`Received an image description: ${imageDescription.result}`);
+                const imagePrompt = this.substitute(imageDescription.result);
+                console.log(`Received an image description: ${imagePrompt}`);
+                
                 const imageResponse = await this.generator.makeImage({
                     aspect_ratio: AspectRatio.WIDESCREEN_HORIZONTAL,
-                    prompt: imageDescription.result
+                    prompt: imagePrompt
                 });
                 if (imageResponse?.url) {
-                    imageUrls.push(`![${imageDescription.result}](${imageResponse.url})`); 
+                    imageUrls.push(`![${this.sanitizeMarkdownContent(imagePrompt)}](${imageResponse.url})`); 
                     if (instruction == this.backgroundImageInstruction) {
                         this.backgroundUrl = imageResponse.url;
                         await this.messenger.updateEnvironment({background: this.backgroundUrl});
@@ -207,11 +213,40 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         return {
             stageDirections: null,
             messageState: this.writeMessageState(),
-            modifiedMessage: newContent,
+            modifiedMessage: imageUrls.join('\n\n') + (imageUrls.length > 0 ? '\n\n' : '') + newContent,
             error: null,
-            systemMessage: (imageUrls.length > 0 ? imageUrls.join('\n\n') : null),
+            systemMessage: null,
             chatState: null
         };
+    }
+
+    // Replace trigger words with less triggering words, so image gen isn't abetting.
+    substitute(input: string) {
+        const synonyms: {[key: string]: string} = {
+            'old-school': 'retro',
+            'old school': 'retro',
+            'oldschool': 'retro',
+            'schoolgirl': 'college girl',
+            'school girl': 'college girl',
+            'schoolboy': 'college guy',
+            'school boy': 'college guy',
+            'youngster': 'individual',
+            'child': 'individual',
+            'kid': 'individual',
+            'young ': ' '
+        }
+        const regex = new RegExp(Object.keys(synonyms).join('|'), 'gi');
+
+        return input.replace(regex, (match) => {
+            const synonym = synonyms[match.toLowerCase()];
+            return match[0] === match[0].toUpperCase()
+                ? synonym.charAt(0).toUpperCase() + synonym.slice(1)
+                : synonym;
+        });
+    }
+
+    sanitizeMarkdownContent(content: string): string {
+        return content.replace(/[\]\(\)]/g, '');
     }
 
     render(): ReactElement {

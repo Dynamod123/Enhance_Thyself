@@ -7,23 +7,26 @@ project_name: "Boss Mode"
 # A short tagline to show in search.
 tagline: "Take control with []s."
 
-creator_notes: "Want to tell the LLM how to do its job? This stage takes your [bracketed instructions] or [[double-bracketed instructions]] and turns them into \"stage directions,\" which are higher-priority instructions that are not directly attributed to the user's input. 
-Simply search for and add this stage to your chat from Chat Settings and you'll be able to leverage this feature in your input. 
+creator_notes: "Want to tell the LLM how to do its job? This stage takes your [bracketed instructions] or [[double-bracketed instructions]] and turns them into \"stage directions,\" 
+which are high-priority instructions that are not directly attributed to the user's input. 
+Simply search for and add this stage to your chat from Chat Settings and you'll be able to leverage these features in your input:
+<ul>
+<li>[Single-bracketed instructions] will be treated as immediate instructions and will only apply to the following response (or its regens).  
+<li>[[Double-bracketed instructions]] will be treated as long-term instructions that apply for multiple responses (10, by default), or until new [[long-term instruction]] is provided. 
+<li>[/imagine Some instruction] will cause an image to be generated and inserted into the response. Unlike Chub's built-in /imagine, this command queries the LLM to build an image description from chat context--including any supplemental details you provide in the brackets.
+<li>[[/imagine Some instruction]] will do the same as above but also apply the resulting image as a chat background.
+</ul>
 <br>
-<br>
-There are multiple advantages to shifting these instructions into stage direction:
+There are multiple advantages to shifting OOC-style instructions into stage directions:
 <ul>
 <li>They are more likely to be honored by the LLM.
 <li>They  are less likely to be mimicked by the LLM.
-<li>You'll maintain cleaner input in your narrative.
+<li>You'll maintain cleaner input in your narrative without manual editing.
 <li>Stage directions fall out of context rather than continue to occupy chat history.
 </ul>
-
-[Single-bracketed instructions] will be treated as immediate instructions and will only apply to the following response (or swipes for that response).  
-[[Double-bracketed instructions]] will be treated as long-term instructions that apply for multiple responses (10, by default--this can be configured on the stage in Chat Settings), or until new [[long-term instruction]] is provided. 
 <br>
 <br>
-For example, if you write:
+As an example, if you write:
 <br>
 <br>
 `I give {{char}} a friendly wave. [{{char}} ignores {{user}}'s wave.] [[{{char}} is always dismissive of {{user}}.]]`
@@ -50,6 +53,7 @@ The stage supports multiple notes per input and also ignores brackets followed b
 This is an incredibly simple quality-of-life stage that I felt some folks might like to be able to drop into their chats. Let me know if you have any issues or suggestions. Thanks!
 <br>
 <br>
+2025.06.10 - Added /imagine support.
 2025.06.02 - Added some clearer logging and fixed a bug with using [[]] to clear long-term instructions.<br>
 2025.04.18 - Playing with allowing this to work in bot responses, but really with the intention of processing intros. It didn't really work because only the initial intro seems to go through the stage.<br>
 2025.04.05 - Added [[double brackets]] for long-term instruction.
