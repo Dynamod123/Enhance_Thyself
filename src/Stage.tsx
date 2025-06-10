@@ -11,6 +11,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
     // Configurable:
     maxLife: number = 10;
+    artStyle: string = 'hyperrealistic illustration, dynamic angle, pleasing lighting';
 
     // Per-message state:
     longTermInstruction: string = '';
@@ -35,6 +36,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
         const {config, messageState} = data;
         this.maxLife = config.maxLife ?? this.maxLife;
+        this.artStyle = config.artStyle ?? this.artStyle;
 
         this.readMessageState(messageState);
     }
@@ -183,13 +185,13 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                     `Information about {{user}}:\n${this.users[promptForId ?? Object.keys(this.users)[0]]}}}\n\n` +
                     `Narrative History:\n{{messages}}\n\n${instruction.length > 0 ? `Essential Image Context to Convey:\n${instruction}\n\n` : ''}` +
                     `Current instruction:\nUse this response to synthesize a concise visual description of the current narrative moment (with essential context in mind). ` +
-                    `This will be used to generate an image of the scene, so use descriptive tags and keywords to convey details about pictured characters (especially gender, skin tone, hair style/color, physique, outfit), setting, and any actions being performed. A couple style words should be included, based on the character information rather than the narration.`,
+                    `This response will be fed directly into an image generator, so use descriptive tags and keywords to convey details about pictured characters (calling out gender, skin tone, hair style/color, physique, outfit, etc.), setting, and any actions being performed.`,
                 min_tokens: 50,
                 max_tokens: 100,
                 include_history: true
             });
             if (imageDescription?.result) {
-                const imagePrompt = this.substitute(imageDescription.result);
+                const imagePrompt = this.substitute(`(${this.artStyle}) ${imageDescription.result}`);
                 console.log(`Received an image description: ${imagePrompt}`);
                 
                 const imageResponse = await this.generator.makeImage({
