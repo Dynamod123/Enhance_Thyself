@@ -189,7 +189,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             console.log(`Generate an image with additional instruction: ${instruction}`);
             const imageDescription = await this.generator.textGen({
                 prompt: 
-                    `Purpose: This goal of this task is to digest the context and craft descriptive input for an image generator.\n\n` +
+                    `Purpose: The goal of this task is to digest the context and craft descriptive input for an image generator.\n\n` +
                     `Narrative History:{{messages}}\n\n${instruction.length > 0 ? `Essential Image Context to Convey:\n${instruction}\n\n` : ''}` +
                     `${Object.values(this.characters).map(character => `Information about ${character.name}:\n${character.personality}`).join(`\n\n`)}\n\n` +
                     `${Object.values(this.users).map(user => `Information about ${user.name}:\n${user.chatProfile}`).join(`\n\n`)}\n\n` +
