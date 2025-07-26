@@ -53,7 +53,7 @@ The stage supports multiple notes per input and also ignores brackets followed b
 This is an incredibly simple quality-of-life stage that I felt some folks might like to be able to drop into their chats. Let me know if you have any issues or suggestions. Thanks!
 <br>
 <br>
-2025.07.26 - (Working on this right now.) There have been some changes to the way that stages are applied to intros. 
+2025.07.26 - There have been some changes to the way that stages are applied to intros. 
 Overall, this is positive news, but the stage was deliberately removing Markdown image links from responses under the assumption that they would be hallucinatory—obviously, that's not true in an intro. 
 The stage now runs a HEAD request to validate image URLs found in responses, so that good links can be maintained while garbage gets removed.<br> 
 2025.06.10 - Added /imagine support.<br>

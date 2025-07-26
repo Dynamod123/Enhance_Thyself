@@ -239,8 +239,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
         const matches = [...text.matchAll(/!?\[.*?\]\((.*?)\)/g)];
 
         const validityChecks = await Promise.all(
-
-            matches.map(match => {console.log(match); return this.isValidUrl(match[1])})
+            matches.map(match => this.isValidUrl(match[1]))
         );
 
         let cleanedText = text;
@@ -255,8 +254,8 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
     async isValidUrl(url: string): Promise<boolean> {
         try {
-            console.log(url);
             const response = await fetch(url, {method: 'HEAD'});
+            console.log(`Validating ${url}: ${response}`);
             return response.ok;
         } catch {
             return false;
