@@ -8,10 +8,11 @@ project_name: "Boss Mode"
 tagline: "Take control with []s."
 
 creator_notes: "Want to tell the LLM how to do its job? This stage takes your [bracketed instructions] or [[double-bracketed instructions]] and turns them into \"stage directions,\" 
-which are high-priority instructions that are not directly attributed to the user's input. 
+which are high-priority instructions that are not directly attributed to the user's input. <br>
+Please ignore the formatting here. I'm trying to get this more organized but it's a chore rebuilding it as I make minor adjustments. <br>
 Simply search for and add this stage to your chat from Chat Settings and you'll be able to leverage multiple features within your input:
 <details>
-<summary class=\"ant-ribbon\" style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
+<summary style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
 [Immediate Instruction]
 </summary>
 <p style=\"margin: 10px 0 0;\">
@@ -19,7 +20,7 @@ Simply search for and add this stage to your chat from Chat Settings and you'll 
 </p>
 </details>
 <details>
-<summary class=\"ant-ribbon\" style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
+<summary style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
 [[Long-Term Instruction]]
 </summary>
 <p style=\"margin: 10px 0 0;\">
@@ -27,7 +28,7 @@ Simply search for and add this stage to your chat from Chat Settings and you'll 
 </p>
 </details>
 <details>
-<summary class=\"ant-ribbon\" style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
+<summary style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
 [/Imagine Some Context]
 </summary>
 <p style=\"margin: 10px 0 0;\">
@@ -37,7 +38,7 @@ Unlike Chub's built-in /imagine, this command queries the LLM to build an image 
 </p>
 </details>
 <details>
-<summary class=\"ant-ribbon\" style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
+<summary style=\"cursor: pointer; font-weight: bold; padding: 6px; border-radius: 4px;\">
 [/Enhance Some Context]
 </summary>
 <p style=\"margin: 10px 0 0;\">
