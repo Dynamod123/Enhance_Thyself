@@ -135,6 +135,8 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                         .replace(/^\s*\[.*?\]\s*/s, '') // Bracketed blocks [ ... ]
                         .replace(/^\s*\{.*?\}\s*/s, '') // Curly brace meta-instructions { ... }
                         .replace(/^\s*\*[A-Z]+:.*?\*\s*(\n|$)/gm, '') // Asterisk-wrapped labels like *HOTFIX:*
+                        .replace(/^\s*\d+%.*?(\n|$)/gm, '') // Percentage status like "100% Input Completion"
+                        .replace(/^\s*Now responding as.*?(\n|$)/gm, '') // "Now responding as" messages
                         .replace(/^\s*\/\w+\s*(\n|$)/gm, '') // Slash commands like /end
                         .replace(/^\s*\d+\..*?(\n|$)/gm, '') // Numbered lists like "1. Continue from..."
                         .replace(/^\s*[A-Z]\).*?(\n|$)/gm, '') // Lettered lists like "A) Having him..."
