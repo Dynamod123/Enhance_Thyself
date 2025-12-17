@@ -134,6 +134,9 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                     textResult = textResult
                         .replace(/^\s*\[.*?\]\s*/s, '') // Bracketed blocks [ ... ]
                         .replace(/^\s*(?:Understood|Noted|Sure|Okay|Alright|Error|Terminating|I cannot|System\s*Alert).*?(\n|$)/is, '') // Conversational/Error lines
+                        .replace(/^\s*(?:You are|Your task|Your role|You're).*?(?:Mode|perspective|acting as).*?(\n|$)/is, '') // System role descriptions
+                        .replace(/^\s*\[?Begin real.*?\]?\s*(\n|$)/is, '') // "Begin real interaction" type lines
+                        .replace(/^\s*(?:About|Context:|Instruction:|Goal:|Background).*?(\n|$)/is, '') // Prompt metadata
                         .trim();
                     if (textResult === original) cleaning = false;
                 }
