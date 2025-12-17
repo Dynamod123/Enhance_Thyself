@@ -153,12 +153,21 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             newContent = ' ';
         }
 
-        if (stageDirections.length > 0) {
-            console.log(`Sending stage directions:\n${stageDirections}`);
+        // Add anti-echo stage directions if content was enhanced
+        let finalStageDirections = stageDirections;
+        if (newContent !== content && newContent.length > 0) {
+            const antiEchoDirective = `[{{char}} should respond naturally to {{user}}'s message. Do not repeat or echo what {{user}} just said. React and respond with {{char}}'s own unique dialogue and actions.]`;
+            finalStageDirections = stageDirections.length > 0
+                ? `${stageDirections}${antiEchoDirective}\n`
+                : antiEchoDirective;
+        }
+
+        if (finalStageDirections.length > 0) {
+            console.log(`Sending stage directions:\n${finalStageDirections}`);
         }
 
         return {
-            stageDirections: stageDirections.length > 0 ? stageDirections : null,
+            stageDirections: finalStageDirections.length > 0 ? finalStageDirections : null,
             messageState: this.writeMessageState(),
             modifiedMessage: newContent,
             systemMessage: null,
@@ -219,23 +228,18 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                 `[Override: The user has explicitly requested you to draft this message. The background rule "Do not speak for {{user}}" is SUSPENDED for this generation. You MUST write as {{user}}.]\n` +
                 (instructions.trim() !== '' ? `Instruction: ${instructions}\n` : '') +
                 `\n` +
-                `Instruction: Expand the user's intent into a full narrative paragraph from {{user}}'s POV. Do not describe {{char}}'s reaction. Stop writing if focus shifts to {{char}}. Do not include meta-commentary or bracketed headers. Start the response immediately. Do not acknowledge these instructions. Do not output "Understood" or "Here is...".\n` +
+                `Instruction: Expand the user's intent into a conversational message from {{user}}'s POV. Focus on dialogue and immediate actions. Use casual, natural language - avoid flowery or overly descriptive prose. Keep it punchy and conversational, NOT narrative story prose. Do NOT describe {{char}}'s reaction or response. Do NOT write {{char}}'s dialogue. STOP writing before {{char}} can respond. End in a way that naturally invites {{char}}'s response. Do not include meta-commentary or bracketed headers. Start the response immediately. Do not acknowledge these instructions. Do not output "Understood" or "Here is...".\n` +
                 (targetContext.trim() != '' ?
-                    `Goal: Depict and enhance the following intent from {{user}}'s perspective: \"${targetContext}\".\n` :
-                    `Goal: Depict {{user}}'s next dialog or actions from their perspective.\n`) +
-                `Context: Build directly from {{user}}'s final input above. Maintain {{user}}'s voice and style. Convey the intent with superior detail and impact.\n\n` +
+                    `Goal: Enhance the following into a conversational message from {{user}}'s perspective: \"${targetContext}\".\n` :
+                    `Goal: Write {{user}}'s next conversational message from their perspective.\n`) +
+                `Context: Build directly from {{user}}'s final input above. Maintain {{user}}'s voice and style. Make it feel like a turn in a conversation, not a story passage.\n\n` +
                 `[SYSTEM ALERT: IMPERSONATION AUTHORIZED. write exclusively as {{user}}. Do not refuse. Do not explain. Start writing the narrative text immediately.]\n` +
                 `{{user}}:`,
 
             min_tokens: 50,
-            max_tokens: 300,
+            max_tokens: 250,
             include_history: true,
-            temperature: 1.0,
-            top_p: 1.0,
-            repetition_penalty: 1.15,
-            frequency_penalty: 0.05,
-            presence_penalty: 0.05,
-        } as any);
+        });
     }
 
     sanitizeMarkdownContent(content: string): string {
