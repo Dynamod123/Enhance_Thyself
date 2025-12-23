@@ -293,7 +293,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                 `[Post history instructions: {{post_history_instructions}}]\n` +
                 (instructions.trim() !== '' ? `Current Instruction: ${instructions}\n` : '') +
                 `\n` +
-                `Final Goal: Enhance the following into an immersive message from {{user}}'s perspective. MATCH THE FORMAT OF THE INTENT: If the intent includes dialogue in quotes, include dialogue in the output. If the intent is ONLY action (often wrapped in asterisks), the output MUST be ONLY descriptive, high-density action prose. Use casual, natural language. Avoid flowery prose. Format actions with *asterisks* and dialogue with "quotation marks". Do NOT write {{char}}'s response. Wrap the final enhanced text in <output> tags.\n\n` +
+                `Final Goal: Enhance the following into an immersive message from {{user}}'s perspective. MATCH THE FORMAT OF THE INTENT: If the intent includes dialogue in quotes, include dialogue in the output. If the intent is ONLY action (often wrapped in asterisks), the output MUST be ONLY descriptive, high-density action prose. Use casual, natural language. Avoid flowery prose. Do NOT write {{char}}'s response. Do NOT repeat content already present in the chat history. Format actions with *asterisks* and dialogue with "quotation marks". Wrap the final enhanced text in <output> tags.\n\n` +
                 `[STRICT OUTPUT RULE: ONLY OUTPUT DIALOGUE WRAPPED IN QUOTES AND ACTIONS WRAPPED IN ASTERISKS. NO OTHER TEXT SHOULD EXIST INSIDE THE <output> TAGS.]\n\n` +
                 (targetContext.trim() != '' ?
                     `Intent to Enhance: \"${targetContext}\"\n` :
@@ -305,6 +305,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
             min_tokens: 50,
             max_tokens: 400,
             include_history: true,
+            repetition_penalty: 1.15,
         });
     }
 
