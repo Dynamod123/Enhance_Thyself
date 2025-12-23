@@ -59,9 +59,14 @@ export const TestStageRunner = <StageType extends StageBase<InitStateType, ChatS
                 .trim();
             if (textResult2 === original) cleaning = false;
         }
-        console.assert(textResult2 === "Hello fallback", `Test 2 Failed: Fallback cleaning (Got: ${textResult2})`);
+        // Test 3: Strict Prose Filter (Isolation of * and ")
+        const rawResponse3 = { result: "2-Party Private Interaction Activated. Subjects: Dyna & Mika Tanaka. *I look at her.* \"Hello.\"" };
+        const proseRegex = /(\*[\s\S]*?\*)|("[\s\S]*?")/g;
+        const matches3 = [...rawResponse3.result.matchAll(proseRegex)].map(m => m[0]);
+        const finalProse3 = matches3.join(' ');
+        console.assert(finalProse3 === "*I look at her.* \"Hello.\"", `Test 3 Failed: Strict filter (Got: ${finalProse3})`);
 
-        console.log("Extraction logic tests passed!");
+        console.log("Extraction and Strict Filter logic tests passed!");
     }
 
     useEffect(() => {

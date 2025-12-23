@@ -168,6 +168,16 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                         .trim();
                     if (textResult === original) cleaning = false;
                 }
+
+                // STRICT PROSE FILTER: Extract ONLY dialogue (in quotes) and actions (in asterisks)
+                const proseRegex = /(\*[\s\S]*?\*)|("[\s\S]*?")/g;
+                const matches = [...textResult.matchAll(proseRegex)].map(m => m[0]);
+                if (matches.length > 0) {
+                    textResult = matches.join(' ');
+                    console.log(`Strict Prose Filter applied. Final text: ${textResult}`);
+                } else {
+                    console.log(`Strict Prose Filter found no matches. Keeping cleaned result.`);
+                }
                 console.log(`Cleaned text Result: ${textResult}`);
 
                 if (textResult.length > 0) {
@@ -273,6 +283,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                 (instructions.trim() !== '' ? `Current Instruction: ${instructions}\n` : '') +
                 `\n` +
                 `Final Goal: Enhance the following into a conversational message from {{user}}'s perspective. Focus on dialogue and immediate actions. Use casual, natural language. Avoid flowery prose. Format actions with *asterisks* and dialogue with "quotation marks". Do NOT write {{char}}'s response. End in a way that naturally invites {{char}}'s response. Wrap the final enhanced text in <output> tags.\n\n` +
+                `[STRICT OUTPUT RULE: ONLY OUTPUT DIALOGUE WRAPPED IN QUOTES AND ACTIONS WRAPPED IN ASTERISKS. NO OTHER TEXT SHOULD EXIST INSIDE THE <output> TAGS.]\n\n` +
                 (targetContext.trim() != '' ?
                     `Intent to Enhance: \"${targetContext}\"\n` :
                     `Goal: Write {{user}}'s next conversational message.\n`) +
