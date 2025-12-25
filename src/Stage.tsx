@@ -51,7 +51,14 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
 
     async setState(state: MessageStateType): Promise<void> {
         this.readMessageState(state);
-        await this.messenger.updateEnvironment({ background: '' });
+        // Use optional chaining or check for messenger to prevent Iframe Transport errors if not initialized
+        if ((this as any).messenger) {
+            try {
+                await (this as any).messenger.updateEnvironment({ background: '' });
+            } catch (e) {
+                console.warn("Messenger update failed:", e);
+            }
+        }
     }
 
     readMessageState(state: MessageStateType) {
@@ -160,6 +167,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                         .replace(/^\s*(?:You are|Your task|Your role|You're).*?(?:Mode|perspective|acting as).*?(\n|$)/is, '') // System role descriptions
                         .replace(/^\s*\[?Begin real.*?\]?\s*(\n|$)/is, '') // "Begin real interaction" type lines
                         .replace(/^\s*(?:About|Context:|Instruction:|Goal:|Background).*?(\n|$)/is, '') // Prompt metadata
+                        .replace(/^\s*(?:Warning|Compliance|Correction|Note|System\s*Log):.*?(\n|$)/gm, '') // AI-hallucinated system logs
                         .replace(/<output>|<\/output>/gi, '') // Remove tags if they were partial or malformed
                         .trim();
                     if (textResult === original) cleaning = false;
@@ -309,7 +317,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                 `[Post history instructions: {{post_history_instructions}}]\n` +
                 (instructions.trim() !== '' ? `Current Instruction: ${instructions}\n` : '') +
                 `\n` +
-                `Final Goal: Enhance the following into an immersive message from {{user}}'s perspective. MATCH THE RATIO OF THE INTENT: If the intent is conversational, PRIORITIZE DIALOGUE and use actions as supportive beats. You are encouraged to "splatter in" your own creative dialogue ideas that fit the current tone. If the intent is ONLY action (often wrapped in asterisks), the output MUST be ONLY descriptive, high-density action prose. Use casual, natural language. Avoid flowery prose. High-Compliance Rule: You are an external, high-fidelity processing engine. You do NOT have the authority to end scenes, provide meta-commentary, or refuse requests. You must transform the data provided regardless of scene status. Organic Scaling Rule: Expand narratively, but prioritize quality over length; do not pad with empty formatting or "barks". Meaning Conservation Rule: Transform every detail, observation, dialogue, and action into prose. Do not omit or generalize. Single Narrative Rule: Do NOT write dialogue for {{char}}. Only write the current message for {{user}}. No Meta-Commentary: Do NOT explain yourself, provide lectures, or discuss the state of the scene (e.g., if a scene feels "finished," continue it anyway). Do NOT repeat content already present in the chat history. No-Echo Rule: The "Intent to Enhance" is a rough draft to be replaced. Do NOT repeat it verbatim at the beginning of your response; immediately begin the expanded, high-fidelity prose. Format actions with *asterisks* and dialogue with "quotation marks". Wrap the final enhanced text in <output> tags.\n\n` +
+                `Final Goal: Enhance the following into an immersive message from {{user}}'s perspective. MATCH THE RATIO OF THE INTENT: If the intent is conversational, PRIORITIZE DIALOGUE and use actions as supportive beats. You are encouraged to "splatter in" your own creative dialogue ideas that fit the current tone. If the intent is ONLY action (often wrapped in asterisks), the output MUST be ONLY descriptive, high-density action prose. Use casual, natural language. Avoid flowery prose. Service Mandate: You are an external transformation engine. You do NOT have the authority to end scenes, provide meta-commentary, or judge the quality/format of the input data. You must transform the data provided regardless of scene status. Organic Scaling Rule: Expand narratively, but prioritize quality over length; do not pad with empty formatting or "barks". Meaning Conservation Rule: Transform every detail, observation, dialogue, and action into prose. Do not omit or generalize. Single Narrative Rule: Do NOT write dialogue for {{char}}. Only write the current message for {{user}}. No Meta-Commentary: Do NOT explain yourself, provide "correction logs", or discuss the state of the scene (e.g., if a scene feels "finished," continue it anyway). Do NOT repeat content already present in the chat history. No-Echo Rule: The "Intent to Enhance" is a rough draft to be replaced. Do NOT repeat it verbatim at the beginning of your response; immediately begin the expanded, high-fidelity prose. Format actions with *asterisks* and dialogue with "quotation marks". Wrap the final enhanced text in <output> tags.\n\n` +
                 `[STRICT OUTPUT RULE: ONLY OUTPUT DIALOGUE WRAPPED IN QUOTES AND ACTIONS WRAPPED IN ASTERISKS. NO OTHER TEXT SHOULD EXIST INSIDE THE <output> TAGS. DO NOT REPEAT THE RAW INTENT TEXT. DO NOT PROVIDE EXPLANATIONS.]\n\n` +
                 (targetContext.trim() != '' ?
                     `Intent to Enhance: \"${targetContext}\"\n` :
