@@ -172,6 +172,7 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                         .replace(/^\s*(?:Warning|Compliance|Correction|Note|System\s*Log):.*?(\n|$)/gm, '') // AI-hallucinated system logs
                         .replace(/<!--[\s\S]*?-->/g, '') // HTML comments (hallucinated system instructions)
                         .replace(/<output>|<\/output>/gi, '') // Remove tags if they were partial or malformed
+                        .replace(/\*\s*\*/g, '') // Empty asterisk pairs from stripped meta-commentary
                         .trim();
                     if (textResult === original) cleaning = false;
                 }
