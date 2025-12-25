@@ -174,12 +174,6 @@ export class Stage extends StageBase<InitStateType, ChatStateType, MessageStateT
                     if (textResult === original) cleaning = false;
                 }
 
-                // HALLUCINATION DISCARD: If the result contains our prompt headers, it's a parrot/hallucination
-                if (textResult.includes('Intent to Enhance:') || textResult.includes('[STRICT OUTPUT RULE]')) {
-                    console.log(`[DIAGNOSTIC] Hallucination Detected: Response contains prompt headers. Discarding.`);
-                    textResult = '';
-                }
-
                 // STRICT PROSE FILTER: Extract ONLY dialogue (in quotes) and actions (in asterisks)
                 if (textResult.length > 0) {
                     console.log(`[DIAGNOSTIC] Pre-Filter Text: ${textResult}`);
